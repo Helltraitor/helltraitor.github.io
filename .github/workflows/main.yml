@@ -1,0 +1,53 @@
+name: Build and deploy on main branch
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule: [cron: '00 12 * * 5']
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      # https://github.com/marketplace/actions/setup-pnpm
+      - name: Instal depends (PNPM)
+        uses: pnpm/action-setup@v2
+        # Relay on automatic recursive installation
+        with:
+          run_install: true
+
+      - name: Build (Vite-SSG, PNPM)
+        run: pnpm build
+
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: github-pages
+      #     path: dist/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: dist/
+
+  # https://github.com/marketplace/actions/deploy-github-pages-site
+  deploy:
+    name: Deploy built site
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
