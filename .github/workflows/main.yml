@@ -25,10 +25,15 @@ jobs:
       - name: Build (Vite-SSG, PNPM)
         run: pnpm build
 
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: github-pages
+      #     path: dist/
+
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-pages-artifact@v1
         with:
-          name: github-pages
           path: dist/
 
   # https://github.com/marketplace/actions/deploy-github-pages-site
