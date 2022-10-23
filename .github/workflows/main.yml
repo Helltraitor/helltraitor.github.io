@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule: [cron: "00 12 * * 5"]
   workflow_dispatch:
 
 jobs:
@@ -28,6 +29,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
+          name: github-pages
           path: dist/
 
   # https://github.com/marketplace/actions/deploy-github-pages-site
