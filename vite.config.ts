@@ -97,8 +97,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Vitesse',
-        short_name: 'Vitesse',
+        name: 'Helltraitor',
+        short_name: 'Helltraitor',
         theme_color: '#ffffff',
       },
     }),
