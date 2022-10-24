@@ -31,6 +31,11 @@ jobs:
       #     name: github-pages
       #     path: dist/
 
+      - name: Remove .html file
+        # Touch in case if not exist
+        # Will fail if dist is not exist
+        run: touch dist/.html && rm dist/.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
