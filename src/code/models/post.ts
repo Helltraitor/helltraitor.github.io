@@ -2,6 +2,7 @@ import { type RouteRecordRaw } from 'vue-router'
 
 export enum Category {
   Developing = 'Developing',
+  Other = 'Other',
   Personal = 'Personal',
 }
 
