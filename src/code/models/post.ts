@@ -1,6 +1,6 @@
 import { type RouteRecordRaw } from 'vue-router'
 
-export enum PostCategory {
+export enum Category {
   Developing = 'Developing',
   Personal = 'Personal',
 }
@@ -8,7 +8,7 @@ export enum PostCategory {
 export interface IPost {
   name: string
   date: Date
-  category: PostCategory
+  category: Category
   tags: string[]
 }
 
@@ -22,8 +22,8 @@ export class Post {
     if (isNaN(date.getDate()))
       throw new TypeError(`Invalid date field: "${post.date}"`)
 
-    const category = post.category as PostCategory
-    if (!Object.values(PostCategory).includes(category))
+    const category = post.category as Category
+    if (!Object.values(Category).includes(category))
       throw new TypeError(`Invalid category field: "${post.date}"`)
 
     if (category === undefined)
