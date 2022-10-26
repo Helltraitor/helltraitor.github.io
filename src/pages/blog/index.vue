@@ -23,7 +23,12 @@ const postPages = generatedPages
 <template>
   <ul>
     <li v-for="(post, index) of postPages" :key="index">
-      <a :href="post.route.path">{{ post.meta.name }}</a>
+      <RouterLink
+        :to="post.route.path"
+        class="icon-btn"
+      >
+        {{ post.meta.name }}
+      </RouterLink>
     </li>
   </ul>
 </template>
