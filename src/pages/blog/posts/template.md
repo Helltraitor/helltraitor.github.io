@@ -2,6 +2,22 @@
 title: Markdown template
 ---
 
+<route lang="yaml">
+meta:
+  model:
+    Post:
+      name: Markdown template
+      date: 2022-10-26
+      category: Other
+      language: English
+      tags:
+        - helltraitor.github.io
+        - markdown
+        - typescript
+        - vite
+        - vue
+</route>
+
 # Markdown template
 Any Post in blog **must** include two parts:
 - Title on top of the markdown file (Used by frontmatter)
@@ -13,9 +29,6 @@ Here is an example of markdown file (this template file):
 title: Markdown template
 ---
 
-# Header
-Content
-
 <route lang="yaml">
 meta:
   model:
@@ -31,6 +44,9 @@ meta:
         - vite
         - vue
 </route>
+
+# Header
+Content
 ```
 
 In future, structure of the Post Markdown file may change
@@ -40,19 +56,3 @@ Pending features:
 - [ ] Chapters (linked markdown)
 - [ ] Several languages for one markdown file
 - [ ] Full highlight via highlight-js for markdown-it
-
-<route lang="yaml">
-meta:
-  model:
-    Post:
-      name: Markdown template
-      date: 2022-10-26
-      category: Other
-      language: English
-      tags:
-        - helltraitor.github.io
-        - markdown
-        - typescript
-        - vite
-        - vue
-</route>
