@@ -8,6 +8,7 @@ const toggleLocales = () => {
 }
 
 class HeaderResizeController {
+  readonly element: HTMLElement
   readonly container: {
     element: HTMLElement
     label: {
@@ -17,14 +18,20 @@ class HeaderResizeController {
     mobile: {
       element: HTMLElement
       scrollWidth: number
+      display: string
     }
     desktop: {
       element: HTMLElement
       scrollWidth: number
+      display: string
     }
   }
 
   constructor(container_id: string, label_id: string, mobile_id: string, desktop_id: string) {
+    const header = document.querySelector('header')
+    if (!(header instanceof HTMLElement))
+      throw new Error('Wrong container id')
+
     const container = document.querySelector(container_id)
     if (!(container instanceof HTMLElement))
       throw new Error('Wrong container id')
@@ -41,6 +48,7 @@ class HeaderResizeController {
     if (!(desktop instanceof HTMLElement))
       throw new Error('Wrong desktop id')
 
+    this.element = header
     this.container = {
       element: container,
       label: {
@@ -50,10 +58,12 @@ class HeaderResizeController {
       mobile: {
         element: mobile,
         scrollWidth: mobile.scrollWidth,
+        display: mobile.style.display,
       },
       desktop: {
         element: desktop,
         scrollWidth: desktop.scrollWidth,
+        display: desktop.style.display,
       },
     }
   }
@@ -64,11 +74,17 @@ class HeaderResizeController {
     const overflow = containerWidth < requiredWidth
 
     if (overflow) {
+      this.element.classList.remove('desktop-header')
+      this.element.classList.add('mobile-header')
+
       this.container.desktop.element.style.display = 'none'
-      this.container.mobile.element.style.display = 'block'
+      this.container.mobile.element.style.display = this.container.mobile.display
     }
     else {
-      this.container.desktop.element.style.display = 'block'
+      this.element.classList.remove('mobile-header')
+      this.element.classList.add('desktop-header')
+
+      this.container.desktop.element.style.display = this.container.desktop.display
       this.container.mobile.element.style.display = 'none'
     }
   }
@@ -89,7 +105,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <header>
+  <header class="desktop-header">
     <div id="headerContainer">
       <div id="headerLabel">
         <RouterLink
@@ -118,7 +134,6 @@ onMounted(() => {
     display: block
     padding: 1.5rem
 
-    position: sticky
     top: 0
 
     div#headerContainer
@@ -143,4 +158,16 @@ onMounted(() => {
 
         & > *
           margin-block: auto
+          display: grid
+
+  header.desktop-header
+    position: fixed
+    width: 100%
+
+    backdrop-filter: blur(10px)
+
+  header.mobile-header
+    position: sticky
+
+    backdrop-filter: blur(10px)
 </style>
