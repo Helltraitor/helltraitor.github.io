@@ -8,7 +8,8 @@ const toggleLocales = () => {
 }
 
 class HeaderResizeController {
-  readonly element: HTMLElement
+  readonly header: HTMLElement
+
   readonly container: {
     element: HTMLElement
     label: {
@@ -27,7 +28,15 @@ class HeaderResizeController {
     }
   }
 
-  constructor(container_id: string, label_id: string, mobile_id: string, desktop_id: string) {
+  readonly spacer: HTMLElement
+
+  constructor(
+    container_id: string,
+    label_id: string,
+    mobile_id: string,
+    desktop_id: string,
+    spacer_id: string,
+  ) {
     const header = document.querySelector('header')
     if (!(header instanceof HTMLElement))
       throw new Error('Wrong container id')
@@ -48,9 +57,13 @@ class HeaderResizeController {
     if (!(desktop instanceof HTMLElement))
       throw new Error('Wrong desktop id')
 
-    this.element = header
+    const spacer = document.querySelector(spacer_id)
+    if (!(spacer instanceof HTMLElement))
+      throw new Error('Wrong spacer id')
+
+    this.header = header
     this.container = {
-      element: container,
+      element: header,
       label: {
         element: label,
         scrollWidth: label.scrollWidth,
@@ -66,23 +79,28 @@ class HeaderResizeController {
         display: desktop.style.display,
       },
     }
+    this.spacer = spacer
   }
 
   public resize(): void {
-    const requiredWidth = this.container.desktop.scrollWidth + this.container.label.scrollWidth
+    const requiredWidth = this.container.desktop.scrollWidth + this.container.label.scrollWidth + 100
     const containerWidth = this.container.element.clientWidth
     const overflow = containerWidth < requiredWidth
 
     if (overflow) {
-      this.element.classList.remove('desktop-header')
-      this.element.classList.add('mobile-header')
+      this.header.classList.remove('desktop-header')
+      this.header.classList.add('mobile-header')
+
+      this.spacer.style.height = '0'
 
       this.container.desktop.element.style.display = 'none'
       this.container.mobile.element.style.display = this.container.mobile.display
     }
     else {
-      this.element.classList.remove('mobile-header')
-      this.element.classList.add('desktop-header')
+      this.header.classList.remove('mobile-header')
+      this.header.classList.add('desktop-header')
+
+      this.spacer.style.height = `${this.header.scrollHeight}px`
 
       this.container.desktop.element.style.display = this.container.desktop.display
       this.container.mobile.element.style.display = 'none'
@@ -96,6 +114,7 @@ onMounted(() => {
     '#headerLabel',
     '#headerNavigationMobile',
     '#headerNavigationDesktop',
+    '#headerDesktopSpacer',
   )
 
   headerResizeController.resize()
@@ -127,14 +146,15 @@ onMounted(() => {
       </div>
     </div>
   </header>
+  <div id="headerDesktopSpacer" />
 </template>
 
 <style scoped lang="sass">
   header
     display: block
-    padding: 1.5rem
-
     top: 0
+
+    backdrop-filter: blur(10px)
 
     div#headerContainer
       display: flex
@@ -162,12 +182,15 @@ onMounted(() => {
 
   header.desktop-header
     position: fixed
+
+    padding: 1.5rem
     width: 100%
 
-    backdrop-filter: blur(10px)
+  div#headerDesktopSpacer
+    margin: 0
+    padding: 0
 
   header.mobile-header
     position: sticky
-
-    backdrop-filter: blur(10px)
+    padding: 1rem
 </style>
