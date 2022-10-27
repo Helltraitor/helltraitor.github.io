@@ -11,6 +11,7 @@ declare module '@vue/runtime-core' {
     Desktop: typeof import('./components/Header/Desktop.vue')['default']
     Footer: typeof import('./components/Footer.vue')['default']
     Header: typeof import('./components/Header/Header.vue')['default']
+    HeaderLabel: typeof import('./components/Header/HeaderLabel.vue')['default']
     HeaderNavigationDesktop: typeof import('./components/Header/HeaderNavigationDesktop.vue')['default']
     HeaderNavigationMobile: typeof import('./components/Header/HeaderNavigationMobile.vue')['default']
     Mobile: typeof import('./components/Header/Mobile.vue')['default']
