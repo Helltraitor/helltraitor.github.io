@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Ref } from 'vue'
+
 const { t, availableLocales, locale } = useI18n()
 
 const toggleLocales = () => {
@@ -7,190 +9,127 @@ const toggleLocales = () => {
   locale.value = locales[(locales.indexOf(locale.value) + 1) % locales.length]
 }
 
-class HeaderResizeController {
-  readonly header: HTMLElement
+const isDesktopHeader = ref(true)
+const requiredDesktopWidth = ref(0)
 
-  readonly container: {
-    element: HTMLElement
-    label: {
-      element: HTMLElement
-      scrollWidth: number
-    }
-    mobile: {
-      element: HTMLElement
-      scrollWidth: number
-      display: string
-    }
-    desktop: {
-      element: HTMLElement
-      scrollWidth: number
-      display: string
-    }
-  }
+/* REF ELEMENTS */
+const headerElement: Ref<HTMLElement | null> = ref(null)
+const headerBlockElement: Ref<HTMLElement | null> = ref(null)
 
-  readonly spacer: HTMLElement
+const headerContainerElement: Ref<HTMLElement | null> = ref(null)
+const headerLabelElement: Ref<HTMLElement | null> = ref(null)
+const headerDesktopElement: Ref<HTMLElement | null> = ref(null)
+/* REF END */
 
-  constructor(
-    container_id: string,
-    label_id: string,
-    mobile_id: string,
-    desktop_id: string,
-    spacer_id: string,
-  ) {
-    const header = document.querySelector('header')
-    if (!(header instanceof HTMLElement))
-      throw new Error('Wrong container id')
+const resizeHeaderHandler = () => {
+  /* Resize check */
+  if (!headerContainerElement.value)
+    throw new Error('Vue: Header container is not represented')
 
-    const container = document.querySelector(container_id)
-    if (!(container instanceof HTMLElement))
-      throw new Error('Wrong container id')
+  isDesktopHeader.value = requiredDesktopWidth.value < headerContainerElement.value.scrollWidth
 
-    const label = document.querySelector(label_id)
-    if (!(label instanceof HTMLElement))
-      throw new Error('Wrong label id')
+  /* Updating height of the under block element */
+  if (!headerBlockElement.value || !headerElement.value)
+    throw new Error('Vue: Header block or its element are not represented')
 
-    const mobile = document.querySelector(mobile_id)
-    if (!(mobile instanceof HTMLElement))
-      throw new Error('Wrong mobile id')
-
-    const desktop = document.querySelector(desktop_id)
-    if (!(desktop instanceof HTMLElement))
-      throw new Error('Wrong desktop id')
-
-    const spacer = document.querySelector(spacer_id)
-    if (!(spacer instanceof HTMLElement))
-      throw new Error('Wrong spacer id')
-
-    this.header = header
-    this.container = {
-      element: header,
-      label: {
-        element: label,
-        scrollWidth: label.scrollWidth,
-      },
-      mobile: {
-        element: mobile,
-        scrollWidth: mobile.scrollWidth,
-        display: mobile.style.display,
-      },
-      desktop: {
-        element: desktop,
-        scrollWidth: desktop.scrollWidth,
-        display: desktop.style.display,
-      },
-    }
-    this.spacer = spacer
-  }
-
-  public resize(): void {
-    const requiredWidth = this.container.desktop.scrollWidth + this.container.label.scrollWidth + 100
-    const containerWidth = this.container.element.clientWidth
-    const overflow = containerWidth < requiredWidth
-
-    if (overflow) {
-      this.header.classList.remove('desktop-header')
-      this.header.classList.add('mobile-header')
-
-      this.spacer.style.height = '0'
-
-      this.container.desktop.element.style.display = 'none'
-      this.container.mobile.element.style.display = this.container.mobile.display
-    }
-    else {
-      this.header.classList.remove('mobile-header')
-      this.header.classList.add('desktop-header')
-
-      this.spacer.style.height = `${this.header.scrollHeight}px`
-
-      this.container.desktop.element.style.display = this.container.desktop.display
-      this.container.mobile.element.style.display = 'none'
-    }
-  }
+  if (headerBlockElement.value.clientHeight !== headerElement.value.clientHeight)
+    headerBlockElement.value.style.height = `${headerElement.value.clientHeight}px`
 }
 
 onMounted(() => {
-  const headerResizeController = new HeaderResizeController(
-    '#headerContainer',
-    '#headerLabel',
-    '#headerNavigationMobile',
-    '#headerNavigationDesktop',
-    '#headerDesktopSpacer',
+  if (!headerContainerElement.value || !headerLabelElement.value || !headerDesktopElement.value)
+    throw new Error('Vue: Header container, label or desktop are not represented')
+
+  requiredDesktopWidth.value = (
+    // 20% from spacer min-width
+    headerContainerElement.value.scrollWidth * 0.2
+    + headerLabelElement.value.scrollWidth
+    + headerDesktopElement.value.scrollWidth
   )
 
-  headerResizeController.resize()
+  // Initial check for mobile
+  resizeHeaderHandler()
 
-  window.addEventListener('resize', () => headerResizeController.resize())
+  // REGISTRATION
+  window.addEventListener('resize', resizeHeaderHandler)
 })
 </script>
 
 <template>
-  <header class="desktop-header">
-    <div id="headerContainer">
-      <div id="headerLabel">
-        <RouterLink
-          id="headerLabelValue"
-          to="/"
-          class="icon-btn"
-        >
-          <p>Helltraitor</p>
-        </RouterLink>
+  <header
+    ref="headerElement"
+    :class="isDesktopHeader ? 'desktop' : 'mobile'"
+  >
+    <div
+      id="headerContainer"
+      ref="headerContainerElement"
+    >
+      <div
+        id="headerLabel"
+        ref="headerLabelElement"
+      >
+        <HeaderLabel />
       </div>
       <div id="headerSpacer" />
-      <div id="headerNavigationBar">
-        <div id="headerNavigationMobile">
-          <HeaderNavigationMobile />
-        </div>
-        <div id="headerNavigationDesktop">
+      <div id="headerNavigation">
+        <div
+          v-show="isDesktopHeader"
+          ref="headerDesktopElement"
+        >
           <HeaderNavigationDesktop />
+        </div>
+        <div
+          v-show="!isDesktopHeader"
+          ref="headerMobileElement"
+        >
+          <HeaderNavigationMobile />
         </div>
       </div>
     </div>
   </header>
-  <div id="headerDesktopSpacer" />
+  <div
+    id="headerBlock"
+    ref="headerBlockElement"
+  />
 </template>
 
 <style scoped lang="sass">
-  header
-    display: block
-    top: 0
+header
+  display: block
 
-    backdrop-filter: blur(10px)
+  position: fixed
+  width: 100%
+  top: 0
 
-    div#headerContainer
-      display: flex
-      margin-inline: 5% 5%
+  backdrop-filter: blur(10px)
 
-      div#headerLabel
-        display: flex
+  div#headerContainer
+    display: flex
 
-        p
-          margin: 0
+    margin-block: auto
+    margin-inline: 5%
 
-          font-family: 'Courier New', Courier, monospace
-          font-size: 22px
+    div#headerLabel
+      margin-inline: 0
+      margin-block: auto
 
-      div#headerSpacer
-        margin-inline: auto
-        min-width: 10%
+    div#headerSpacer
+      margin-inline: auto
+      min-width: 20%
 
-      div#headerNavigationBar
-        display: flex
+    div#headerNavigation
+      margin-inline: 0
+      margin-block: auto
 
-        & > *
-          margin-block: auto
-          display: grid
+header.desktop
+  padding: 1.5rem
 
-  header.desktop-header
-    position: fixed
+header.mobile
+  padding: 1rem
 
-    padding: 1.5rem
-    width: 100%
+div#headerBlock
+  width: 100%
 
-  div#headerDesktopSpacer
-    margin: 0
-    padding: 0
-
-  header.mobile-header
-    position: sticky
-    padding: 1rem
+  margin: 0
+  padding: 0
 </style>
