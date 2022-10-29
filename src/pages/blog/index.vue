@@ -86,36 +86,55 @@ const requiredTags = ref(new Set(queryTags))
 
 /* UPDATING */
 const updatePostShowedRef = () => {
-  records.forEach(({ showed }) => showed.value = true)
+  let showedRecords = [...records]
+  const hiddenRecords = []
 
   if (requiredCategory.value) {
-    records.forEach(({ post, showed }) => {
-      showed.value = post.meta.category as string === requiredCategory.value
-    })
+    const candidateRecords = showedRecords
+    showedRecords = []
+
+    for (const record of candidateRecords) {
+      if (record.post.meta.category as string === requiredCategory.value)
+        showedRecords.push(record)
+      else
+        hiddenRecords.push(record)
+    }
   }
 
   if (requiredLanguage.value) {
-    records
-      .filter(({ showed }) => showed.value)
-      .forEach(({ post, showed }) => {
-        showed.value = post.meta.language as string === requiredLanguage.value
-      })
+    const candidateRecords = showedRecords
+    showedRecords = []
+
+    for (const record of candidateRecords) {
+      if (record.post.meta.language === requiredLanguage.value)
+        showedRecords.push(record)
+      else
+        hiddenRecords.push(record)
+    }
   }
 
   if (requiredTags.value.size !== 0) {
-    records
-      .filter(({ showed }) => showed.value)
-      .forEach(({ post, showed }) => {
-        let mustShow = false
-        for (const tag of post.meta.tags) {
-          if (requiredTags.value.has(tag)) {
-            mustShow = true
-            break
-          }
+    const candidateRecords = showedRecords
+    showedRecords = []
+
+    for (const record of candidateRecords) {
+      let mustShow = false
+      for (const tag of record.post.meta.tags) {
+        if (requiredTags.value.has(tag)) {
+          mustShow = true
+          break
         }
-        showed.value = mustShow
-      })
+      }
+
+      if (mustShow)
+        showedRecords.push(record)
+      else
+        hiddenRecords.push(record)
+    }
   }
+
+  showedRecords.forEach(({ showed }) => showed.value = true)
+  hiddenRecords.forEach(({ showed }) => showed.value = false)
 }
 /* -------- */
 
