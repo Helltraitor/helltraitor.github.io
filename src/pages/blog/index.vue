@@ -86,55 +86,40 @@ const requiredTags = ref(new Set(queryTags))
 
 /* UPDATING */
 const updatePostShowedRef = () => {
-  let showedRecords = [...records]
-  const hiddenRecords = []
+  const candidateRecords = records.map(({ post, showed }) => {
+    return { post, showed, mustShow: true }
+  })
 
   if (requiredCategory.value) {
-    const candidateRecords = showedRecords
-    showedRecords = []
-
-    for (const record of candidateRecords) {
-      if (record.post.meta.category as string === requiredCategory.value)
-        showedRecords.push(record)
-      else
-        hiddenRecords.push(record)
-    }
+    candidateRecords.forEach((record) => {
+      record.mustShow = record.post.meta.category as string === requiredCategory.value
+    })
   }
 
   if (requiredLanguage.value) {
-    const candidateRecords = showedRecords
-    showedRecords = []
-
-    for (const record of candidateRecords) {
-      if (record.post.meta.language === requiredLanguage.value)
-        showedRecords.push(record)
-      else
-        hiddenRecords.push(record)
-    }
+    candidateRecords
+      .filter(({ mustShow }) => mustShow)
+      .forEach((record) => {
+        record.mustShow = record.post.meta.language as string === requiredLanguage.value
+      })
   }
 
   if (requiredTags.value.size !== 0) {
-    const candidateRecords = showedRecords
-    showedRecords = []
-
-    for (const record of candidateRecords) {
-      let mustShow = false
-      for (const tag of record.post.meta.tags) {
-        if (requiredTags.value.has(tag)) {
-          mustShow = true
-          break
+    candidateRecords
+      .filter(({ mustShow }) => mustShow)
+      .forEach((record) => {
+        let mustShow = false
+        for (const tag of record.post.meta.tags) {
+          if (requiredTags.value.has(tag)) {
+            mustShow = true
+            break
+          }
         }
-      }
-
-      if (mustShow)
-        showedRecords.push(record)
-      else
-        hiddenRecords.push(record)
-    }
+        record.mustShow = mustShow
+      })
   }
 
-  showedRecords.forEach(({ showed }) => showed.value = true)
-  hiddenRecords.forEach(({ showed }) => showed.value = false)
+  candidateRecords.forEach(({ showed, mustShow }) => { showed.value = mustShow })
 }
 /* -------- */
 
