@@ -33,7 +33,7 @@ const resizeHeaderHandler = () => {
     throw new Error('Vue: Header block or its element are not represented')
 
   if (headerBlockElement.value.clientHeight !== headerElement.value.clientHeight)
-    headerBlockElement.value.style.height = `${headerElement.value.clientHeight}px`
+    headerBlockElement.value.style.minHeight = `${headerElement.value.clientHeight}px`
 }
 
 onMounted(() => {
