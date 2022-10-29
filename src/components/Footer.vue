@@ -36,7 +36,7 @@
           <a
             href="https://vuejs.org"
           >
-            Vue
+            <b>Vue</b>
           </a> and other technologies.
         </p>
       </div>
