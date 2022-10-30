@@ -133,15 +133,34 @@ onMounted(updatePostShowedRef)
 </script>
 
 <template>
-  <ul>
-    <li v-for="({ post, showed }, index) of records" :key="index">
-      <RouterLink
-        v-show="showed.value"
-        class="icon-btn"
-        :to="post.route.path"
       >
-        {{ post.meta.name }}
-      </RouterLink>
+  <ul>
+    <li
+      v-for="({ post, showed }, index) of records" :key="index"
+      mb-4
+      flex flex-col
+    >
+      <div v-show="showed.value">
+        <RouterLink
+          class="icon-btn"
+          :to="post.route.path"
+        >
+          <div>
+            <p text-xl>
+              {{ post.meta.name }}
+            </p>
+            <div flex>
+              <p
+                text-sm
+                text-gray-400 dark:text-gray-500
+              >
+                {{ post.meta.updated.toDateString() }}
+                - {{ post.meta.category }}, {{ post.meta.language }}
+              </p>
+            </div>
+          </div>
+        </RouterLink>
+      </div>
     </li>
   </ul>
 </template>
