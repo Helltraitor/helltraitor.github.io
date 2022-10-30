@@ -39,24 +39,28 @@ const toggleNavigation = () => {
       <RouterLink
         to="/blog"
         class="icon-btn"
+        @click="toggleNavigation()"
       >
         Blog
       </RouterLink>
       <a
         href="https://github.com/helltraitor"
         class="icon-btn"
+        @click="toggleNavigation()"
       >
         Github
       </a>
       <a
         href="https://github.com/helltraitor/helltraitor.github.io"
         class="icon-btn"
+        @click="toggleNavigation()"
       >
         Source
       </a>
       <a
         href="mailto: helltraitor@hotmail.com"
         class="icon-btn"
+        @click="toggleNavigation()"
       >
         Mail
       </a>
