@@ -119,7 +119,9 @@ const updatePostShowedRef = () => {
       })
   }
 
-  candidateRecords.forEach(({ showed, mustShow }) => { showed.value = mustShow })
+  candidateRecords
+    .filter(({ showed, mustShow }) => { return showed.value !== mustShow })
+    .forEach(({ showed, mustShow }) => { showed.value = mustShow })
 }
 /* -------- */
 
