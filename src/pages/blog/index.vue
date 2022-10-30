@@ -108,14 +108,9 @@ const updatePostShowedRef = () => {
     candidateRecords
       .filter(({ mustShow }) => mustShow)
       .forEach((record) => {
-        let mustShow = false
-        for (const tag of record.post.meta.tags) {
-          if (requiredTags.value.has(tag)) {
-            mustShow = true
-            break
-          }
-        }
-        record.mustShow = mustShow
+        const tagStack = new Set([...requiredTags.value.keys()])
+        record.post.meta.tags.forEach(tag => tagStack.delete(tag))
+        record.mustShow = tagStack.size === 0
       })
   }
 
