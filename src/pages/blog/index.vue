@@ -118,12 +118,38 @@ const updatePostShowedRef = () => {
     .filter(({ showed, mustShow }) => { return showed.value !== mustShow })
     .forEach(({ showed, mustShow }) => { showed.value = mustShow })
 }
+
+/* QUERY UPDATING */
+const updateQuerySearch = () => {
+  const queryParameters = new URLSearchParams()
+
+  if (requiredCategory.value)
+    queryParameters.append('category', requiredCategory.value)
+
+  if (requiredLanguage.value)
+    queryParameters.append('language', requiredLanguage.value)
+
+  if (requiredTags.value.size !== 0)
+    for (const tag of requiredTags.value.keys())
+      queryParameters.append('tag', tag)
+
+  const queryString = queryParameters.toString()
+  const relativePath = window.location.pathname + (
+    queryString.length === 0 ? '' : `?${queryString}`
+  )
+  window.history.replaceState(null, '', relativePath)
+}
 /* -------- */
 
 /* WATCHERS */
 watch(requiredCategory, updatePostShowedRef)
 watch(requiredLanguage, updatePostShowedRef)
-watch(requiredTags, updatePostShowedRef)
+watch(requiredTags, updatePostShowedRef, { deep: true })
+
+watch(requiredCategory, updateQuerySearch)
+watch(requiredLanguage, updateQuerySearch)
+watch(requiredTags, updateQuerySearch, { deep: true })
+/* -------- */
 
 /* SETUP */
 onMounted(updatePostShowedRef)
