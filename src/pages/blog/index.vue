@@ -153,9 +153,101 @@ watch(requiredTags, updateQuerySearch, { deep: true })
 
 /* SETUP */
 onMounted(updatePostShowedRef)
+
+const isFilterShowed = ref(false)
+
+/* TAG INPUT */
+const tagInput = ref(null)
+const tagInputHandler = () => {
+  if (!tagInput.value)
+    return
+
+  // No need to check requiredTags since it set storage
+  if (tagRecords.has(tagInput.value)) {
+    requiredTags.value.add(tagInput.value)
+    tagInput.value = null
+  }
+}
 </script>
 
 <template>
+  <div mb-6>
+    <button
+      btn
+      class="filter-button"
+      @click="isFilterShowed = !isFilterShowed"
+    >
+      <p v-if="!isFilterShowed">
+        Show filter options
+      </p>
+      <p v-else>
+        Hide filter options
+      </p>
+    </button>
+    <div
+      v-show="isFilterShowed"
+      mt-4 mb-4 p-1
+      b-1 b-rd
+    >
+      <div flex flex-col>
+        <span m-2 flex>
+          <p mr-2>
+            Category:
+          </p>
+          <select v-model="requiredCategory" b-rd>
+            <option :value="null" />
+            <option v-for="(category, index) of categoryRecords.keys()" :key="index">
+              {{ category }}
+            </option>
+          </select>
+        </span>
+        <span m-2 flex>
+          <p mr-2>
+            Language:
+          </p>
+          <select v-model="requiredLanguage" b-rd>
+            <option :value="null" />
+            <option v-for="(language, index) of languageRecords.keys()" :key="index">
+              {{ language }}
+            </option>
+          </select>
+        </span>
+
+        <div m-2 flex flex-col>
+          <div flex>
+            <p mr-2>
+              Tag:
+            </p>
+            <input
+              v-model="tagInput"
+              b-1 b-rd
+              pl-1 pr-1
+              placeholder="Type some tag"
+              @keydown.enter="tagInputHandler()"
+            >
+          </div>
+          <div
+            m-2
+            flex
+            gap-1
+          >
+            <button
+              v-for="(tag, index) of requiredTags.keys()" :key="index"
+              btn
+              b-1
+              b-rd pr-2
+              pl-2 flex
+              class="remove-button"
+              @click="requiredTags.delete(tag)"
+            >
+              {{ tag }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <ul>
     <li
       v-for="({ post, showed }, index) of records" :key="index"
@@ -186,3 +278,21 @@ onMounted(updatePostShowedRef)
     </li>
   </ul>
 </template>
+
+<style scoped lang="sass">
+button.filter-button
+  background-color: cadetblue
+  transition: all 0.4s
+
+button.filter-button:hover
+  filter: brightness(85%)
+  transition: all 0.4s
+
+button.remove-button
+  background-color: lightsalmon
+  transition: all 0.4s
+
+button.remove-button:hover
+  filter: brightness(85%)
+  transition: all 0.4s
+</style>
