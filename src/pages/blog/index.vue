@@ -135,7 +135,6 @@ onMounted(updatePostShowedRef)
 </script>
 
 <template>
-      >
   <ul>
     <li
       v-for="({ post, showed }, index) of records" :key="index"
