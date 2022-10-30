@@ -96,6 +96,7 @@ onMounted(() => {
 <style scoped lang="sass">
 header
   display: block
+  z-index: 1
 
   position: fixed
   width: 100%

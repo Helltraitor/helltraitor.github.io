@@ -94,6 +94,8 @@ div#headerMobileNavigationContainer
   background: #12121210
   backdrop-filter: blur(10px)
 
+  z-index: 2
+
   left: 0
   right: 0
 
